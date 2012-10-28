@@ -3,20 +3,20 @@ html
   head
     title
       if title && project.name
-        !{title} | !{project.name}
+        #{title.charAt(0).toUpperCase() + title.slice(1)} | #{project.name}
       else if project.name
-        !{project.name}
-      else if title 
-        !{title}
+        #{project.name}
+      else if title
+        #{title}
     meta(charset='utf-8')
-    != '<style>'
-      include docs.css
-    != '</style>'
-    if (resources && resources.css)
-      style(type="text/preview") !{resources.css}
-    if (resources && resources.js)
-      script(type="text/preview") !{resources.js}
-  body
+    script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js")
+    if (resources.docs && resources.docs.css)
+      style !{resources.docs.css}
+    if (resources.previews && resources.previews.js)
+      script(type="text/preview") !{resources.previews.js}
+    if (resources.previews && resources.previews.css)
+      style(type="text/preview") !{resources.previews.css}
+  body(onload="prettyPrint()")
     nav.bar.top.cf
       .container
         a.brand(href="index.html") #{project.name}
@@ -36,26 +36,37 @@ html
                 li: a(href="#{link.href}") #{link.name}
 
         .nav
-          button(title="Table of Contents",data-toggle="nav-toc")
-            svg.icon(viewBox="0 0 512 512",height=22,width=22)
-              path(d="M108.9,403.1V462H50v-58.9H108.9z M108.9,285.4H50v58.9h58.9V285.4zM108.9,50H50v58.9h58.9V50z M108.9,167.7H50v58.9h58.9V167.7z M167.7,344.3H462v-58.9H167.7V344.3zM167.7,50v58.9H462V50H167.7z M167.7,462H462v-58.9H167.7V462z M167.7,226.6H462v-58.9H167.7V226.6z")
-          ul#nav-toc.nav-results.toc-list(hidden)
           input.search(type="search",placeholder="Search")
-          ul#nav-search.nav-results(hidden)
+
+    if title
+      div.stylenav
+        button(title="Table of Contents",data-toggle="nav-toc")
+          svg.icon(viewBox="0 0 512 512",height=22,width=22)
+            path(d="M108.9,403.1V462H50v-58.9H108.9z M108.9,285.4H50v58.9h58.9V285.4zM108.9,50H50v58.9h58.9V50z M108.9,167.7H50v58.9h58.9V167.7z M167.7,344.3H462v-58.9H167.7V344.3zM167.7,50v58.9H462V50H167.7z M167.7,462H462v-58.9H167.7V462z M167.7,226.6H462v-58.9H167.7V226.6z")
+        a.csstoggle(href="#") Show CSS
+    else
+      div.stylenav.hidden
+        button(title="Table of Contents",data-toggle="nav-toc")
+          svg.icon(viewBox="0 0 512 512",height=22,width=22)
+            path(d="M108.9,403.1V462H50v-58.9H108.9z M108.9,285.4H50v58.9h58.9V285.4zM108.9,50H50v58.9h58.9V50z M108.9,167.7H50v58.9h58.9V167.7z M167.7,344.3H462v-58.9H167.7V344.3zM167.7,50v58.9H462V50H167.7z M167.7,462H462v-58.9H167.7V462z M167.7,226.6H462v-58.9H167.7V226.6z")
+        a.csstoggle(href="#") Show CSS
+
 
     section.container
       each section, i in sections
         article.section(id="#{section.slug}")
-          .docs
-            a.permalink(href="##{section.slug}")
-              svg.icon(viewBox="0 0 512 512",height=32,width=32)
+          div.docs(style="#{title ? '' : 'width:auto'}")
+            if title
+              a.textpermalink(href="##{section.slug}", title="Permalink") Permalink
+            a.permalink(href="##{section.slug}", title="Permalink")
+              svg.icon(viewBox="0 0 512 512",height=20,width=20)
                 path(d="M156.2,199.7c7.5-7.5,15.9-13.8,24.8-18.7c49.6-27.3,113.1-12.8,145,35.5l-38.5,38.5c-11.1-25.2-38.5-39.6-65.8-33.5c-10.3,2.3-20.1,7.4-28,15.4l-73.9,73.9c-22.4,22.4-22.4,58.9,0,81.4c22.4,22.4,58.9,22.4,81.4,0l22.8-22.8c20.7,8.2,42.9,11.5,64.9,9.9l-50.3,50.3c-43.1,43.1-113,43.1-156.1,0c-43.1-43.1-43.1-113-0-156.1L156.2,199.7z M273.6,82.3l-50.3,50.3c21.9-1.6,44.2,1.6,64.9,9.9l22.8-22.8c22.4-22.4,58.9-22.4,81.4,0c22.4,22.4,22.4,58.9,0,81.4l-73.9,73.9c-22.5,22.5-59.1,22.3-81.4,0c-5.2-5.2-9.7-11.7-12.5-18l-38.5,38.5c4,6.1,8.3,11.5,13.7,16.9c13.9,13.9,31.7,24.3,52.1,29.3c26.5,6.4,54.8,2.8,79.2-10.6c8.9-4.9,17.3-11.1,24.8-18.7l73.9-73.9c43.1-43.1,43.1-113,0-156.1C386.6,39.2,316.7,39.2,273.6,82.3z")
             !{section.docs}
           if section.code
             .code
-              pre: code !{section.code}
-    .bar.bottom.settings(hidden)
-      .container
+              pre(class="prettyprint"): code !{section.code}
+    .bar.bottom
+      .settings.container(hidden)
         // Icons from http://iconmonstr.com
         button(title="Desktop (1280)",data-width=1280)
           svg.icon(viewBox="0 0 412 386",height=24,width=26)
@@ -73,11 +84,6 @@ html
           svg.icon(viewBox="0 0 201 412",height=24,width=12)
             path(d="M 165.5,0.2 V 45 H 25 c -13.8,0 -25,11.2 -25,25 V 387 c 0,13.8 11.2,25 25,25 h 150.5 c 13.8,0 25,-11.2 25,-25 V 0.2 h -35 z M 65.2,366.5 H 34.2 v -24.5 h 31 v 24.5 z m 0,-44.3 H 34.2 v -24.5 h 31 v 24.5 z m 50.5,44.3 H 84.7 v -24.5 h 31 v 24.5 z m 0,-44.3 H 84.7 v -24.5 h 31 v 24.5 z m 50.5,44.3 h -31 v -24.5 h 31 v 24.5 z m 0,-44.3 h -31 v -24.5 h 31 v 24.5 z m 0,-59.3 h -132 V 95.4 h 132 V 262.9 z")
         button.auto.is-active(title="Auto (100%)",data-width="auto") Auto
-
-    != '<script>'
-    - if (resources && resources.searchIndex)
-      | var searchIndex = !{resources.searchIndex};
-      include docs.js
-    != '</script>'
-
-// Generated with StyleDocco (http://jacobrask.github.com/styledocco).
+    if (resources.docs && resources.docs.js)
+      script !{resources.docs.js}
+<!-- Generated with StyleDocco (http://jacobrask.github.com/styledocco). -->

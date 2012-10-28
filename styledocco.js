@@ -4,7 +4,7 @@ var marked = require('marked');
 marked.setOptions({ sanitize: false, gfm: true });
 
 // Regular expressions to match comments. We only match comments in
-// the beginning of lines. 
+// the beginning of lines.
 var commentRegexs = {
   single: /^\/\//, // Single line comments for Sass, Less and Stylus
   multiStart: /^\/\*/,
@@ -101,7 +101,7 @@ var makeSections = exports.makeSections = function(blocks) {
           if (token.type === 'code' && (token.lang == null || token.lang === 'html')) {
             token.type = 'html';
             token.pre = true;
-            token.text = '<textarea class="preview-code" spellcheck="false">' + htmlEntities(token.text) + '</textarea>';
+            token.text = '<pre class="preview-code prettyprint" readonly spellcheck="false">' + htmlEntities(token.text) + '</pre>' + '<pre class="preview-code-replace" readonly spellcheck="false">' + htmlEntities(token.text) + '</pre>';
           // Add permalink `id`s and some custom properties to headings.
           } else if (token.type === 'heading') {
             var slug = slugify(token.text);
